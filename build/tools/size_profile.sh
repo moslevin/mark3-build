@@ -75,6 +75,8 @@ KERNEL_SIZE=0
 SYNCOBJ_SIZE=0
 PORT_SIZE=0
 FEATURE_SIZE=0
+COROUTINE_SIZE=0
+UNTRACKED_SIZE=0
 IFS_CACHE=$IFS
 
 #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60----5---70----5---80"
@@ -186,11 +188,6 @@ for LINE in ${MARK3_DATA}; do
             MODNAME="Synchronization Objects - Base Class............"
             KERNEL_SIZE=$(( KERNEL_SIZE+${DEC} ))
             ;;
-        "driver.cpp.obj")
-            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
-            MODNAME="Device Driver Framework (including /dev/null)..."
-            FEATURE_SIZE=$(( FEATURE_SIZE+${DEC} ))
-            ;;
         "eventflag.cpp.obj")
             #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
             MODNAME="Synchronization Object - Event Flag............."
@@ -214,12 +211,12 @@ for LINE in ${MARK3_DATA}; do
         "notify.cpp.obj")
             #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
             MODNAME="Notification Blocking Object...................."
-            PORT_SIZE=$(( PORT_SIZE+${DEC} ))
+            SYNCOBJ_SIZE=$(( SYNCOBJ_SIZE+${DEC} ))
             ;;
         "mailbox.cpp.obj")
             #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
             MODNAME="Mailbox IPC Support............................."
-            PORT_SIZE=$(( PORT_SIZE+${DEC} ))
+            SYNCOBJ_SIZE=$(( SYNCOBJ_SIZE+${DEC} ))
             ;;
         "priomap.cpp.obj")
             #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
@@ -256,6 +253,11 @@ for LINE in ${MARK3_DATA}; do
             MODNAME="Fundamental Kernel Thread-list Data Structures.."
             KERNEL_SIZE=$(( KERNEL_SIZE+${DEC} ))
             ;;
+        "threadlistlist.cpp.obj")
+            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
+            MODNAME="ThreadListList Data Structures.................."
+            KERNEL_SIZE=$(( KERNEL_SIZE+${DEC} ))
+            ;;
         "kernel.cpp.obj")
             #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
             MODNAME="Mark3 Kernel Base Class........................."
@@ -269,21 +271,6 @@ for LINE in ${MARK3_DATA}; do
         "timer.cpp.obj")
             #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
             MODNAME="Software Timer Kernel Object...................."
-            FEATURE_SIZE=$(( FEATURE_SIZE+${DEC} ))
-            ;;
-        "transaction.cpp.obj")
-            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
-            MODNAME="Kernel Transaction Queues......................."
-            KERNEL_SIZE=$(( KERNEL_SIZE+${DEC} ))
-            ;;
-        "tracebuffer.cpp.obj")
-            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
-            MODNAME="Runtime Kernel Trace Implementation............."
-            FEATURE_SIZE=$(( FEATURE_SIZE+${DEC} ))
-            ;;
-        "writebuf16.cpp.obj")
-            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
-            MODNAME="Circular Logging Buffer Base Class.............."
             FEATURE_SIZE=$(( FEATURE_SIZE+${DEC} ))
             ;;
         "threadport.cpp.obj")
@@ -326,8 +313,24 @@ for LINE in ${MARK3_DATA}; do
             MODNAME="RAII Locking Support based on Mark3 Mutex class."
             SYNCOBJ_SIZE=$(( SYNCOBJ_SIZE+${DEC} ))
             ;;            
+        "colist.cpp.obj")
+            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
+            MODNAME="Coroutine task-list management.................."
+            COROUTINE_SIZE=$(( COROUTINE_SIZE+${DEC} ))
+            ;;
+        "cosched.cpp.obj")
+            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
+            MODNAME="Coroutine task scheduler........................"
+            COROUTINE_SIZE=$(( COROUTINE_SIZE+${DEC} ))
+            ;;
+        "coroutine.cpp.obj")
+            #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60"
+            MODNAME="Main coroutine task object......................"
+            COROUTINE_SIZE=$(( COROUTINE_SIZE+${DEC} ))
+            ;;
          *)
             MODNAME=${MODULE}
+            UNTRACKED_SIZE=$(( UNTRACKED_SIZE+${DEC} ))
             ;;
     esac
 
@@ -341,7 +344,7 @@ IFS="
 "
 done
 
-TOTAL_SIZE=$(( FEATURE_SIZE+PORT_SIZE+SYNCOBJ_SIZE+KERNEL_SIZE ))
+TOTAL_SIZE=$(( FEATURE_SIZE+PORT_SIZE+SYNCOBJ_SIZE+KERNEL_SIZE+COROUTINE_SIZE+UNTRACKED_SIZE ))
 
 #Ruler:  ----5---10----5---20----5---30----5---40----5---50----5---60----5---70----5---80"
 
@@ -354,6 +357,8 @@ if [ "${FORMAT}" = "console" ]; then
     echo    "Synchronization Objects  : " ${SYNCOBJ_SIZE} "Bytes"
     echo    "Port                     : " ${PORT_SIZE} "Bytes"
     echo    "Features                 : " ${FEATURE_SIZE} "Bytes"
+    echo    "Coroutines               : " ${COROUTINE_SIZE} "Bytes"
+    echo    "Untracked Objects        : " ${UNTRACKED_SIZE} "Bytes"
     echo    "================================================================="
     echo    "Total Size               : " ${TOTAL_SIZE} "Bytes"
 else
@@ -365,6 +370,8 @@ else
     echo    "    - Synchronization Objects  : " ${SYNCOBJ_SIZE} "Bytes"
     echo    "    - Port                     : " ${PORT_SIZE} "Bytes"
     echo    "    - Features                 : " ${FEATURE_SIZE} "Bytes"
+    echo    "    - Coroutines               : " ${COROUTINE_SIZE} "Bytes"
+    echo    "    - Untracked Objects        : " ${UNTRACKED_SIZE} "Bytes"
     echo    "    - Total Size               : " ${TOTAL_SIZE} "Bytes"
     echo    "@endcode"
 
