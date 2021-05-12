@@ -44,7 +44,7 @@ set(CM3_CXX_FLAGS "\
     -nostartfiles \
     -mthumb \
     -mcpu=cortex-m3 \
-    -std=c++11 \
+    -std=c++17 \
     -DARM \
     -D__CM3_REV=0x0202 \
     -D__MPU_PRESENT=1 \
